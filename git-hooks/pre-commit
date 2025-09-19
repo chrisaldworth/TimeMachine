@@ -1,0 +1,36 @@
+#!/bin/bash
+
+# Pre-commit hook for ticket-first development
+echo "🔍 Checking staged changes for ticket-first development rules..."
+
+# Get staged files
+STAGED_FILES=$(git diff --cached --name-only)
+
+# Check if there are any staged files
+if [ -z "$STAGED_FILES" ]; then
+    echo "❌ ERROR: No files staged for commit"
+    echo "   Use 'git add <files>' to stage files before committing"
+    exit 1
+fi
+
+echo "✅ Staged files:"
+echo "$STAGED_FILES" | sed 's/^/   /'
+
+# Check if tasks.json exists and is valid
+if [ ! -f "project-management/tasks.json" ]; then
+    echo "❌ ERROR: tasks.json not found"
+    echo "   Make sure you're in the project root directory"
+    exit 1
+fi
+
+# Validate tasks.json is valid JSON
+if ! node -e "JSON.parse(require('fs').readFileSync('project-management/tasks.json', 'utf8'))" 2>/dev/null; then
+    echo "❌ ERROR: tasks.json is not valid JSON"
+    exit 1
+fi
+
+echo "✅ Pre-commit validation passed!"
+echo "📋 Ready to commit with proper task ID in commit message"
+echo ""
+echo "📝 Remember to use format: type(TASK-XXX): description"
+echo "   Example: feat(TASK-026): implement photo upload interface"
