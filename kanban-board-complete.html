@@ -1,0 +1,1744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rewind the Map - Complete Task Kanban Board</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .column {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(10px);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            z-index: 10;
+        }
+
+        .column-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .task-count {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .task {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-left: 4px solid #ddd;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .task:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+
+        .task.high-priority {
+            border-left-color: #e74c3c;
+        }
+
+        .task.medium-priority {
+            border-left-color: #f39c12;
+        }
+
+        .task.low-priority {
+            border-left-color: #27ae60;
+        }
+
+        .task-id {
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .task-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .task-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .task-assignee {
+            background: #f8f9fa;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+
+        .task-hours {
+            background: #e3f2fd;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+
+        .task-description {
+            font-size: 0.85rem;
+            color: #555;
+            line-height: 1.4;
+            margin-top: 8px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            color: white;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            display: block;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .phase-badge {
+            background: #9c27b0;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🎯 Rewind the Map</h1>
+        <p>Complete Task Management Kanban Board - All 88 Tasks</p>
+    </div>
+
+    <div class="stats" id="stats">
+        <div class="stat">
+            <span class="stat-number" id="total-tasks">88</span>
+            <span class="stat-label">Total Tasks</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number" id="in-progress">0</span>
+            <span class="stat-label">In Progress</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number" id="completed">0</span>
+            <span class="stat-label">Completed</span>
+        </div>
+        <div class="stat">
+            <span class="stat-number" id="review">1</span>
+            <span class="stat-label">In Review</span>
+        </div>
+    </div>
+
+    <div class="kanban-board" id="kanban-board">
+        <div class="column">
+            <div class="column-header">
+                <div class="column-title">📋 Backlog</div>
+                <div class="task-count" id="backlog-count">0</div>
+            </div>
+            <div id="backlog-tasks"></div>
+        </div>
+
+        <div class="column">
+            <div class="column-header">
+                <div class="column-title">📝 Todo</div>
+                <div class="task-count" id="todo-count">87</div>
+            </div>
+            <div id="todo-tasks"></div>
+        </div>
+
+        <div class="column">
+            <div class="column-header">
+                <div class="column-title">🔄 In Progress</div>
+                <div class="task-count" id="in-progress-count">0</div>
+            </div>
+            <div id="in-progress-tasks"></div>
+        </div>
+
+        <div class="column">
+            <div class="column-header">
+                <div class="column-title">👀 Review</div>
+                <div class="task-count" id="review-count">1</div>
+            </div>
+            <div id="review-tasks"></div>
+        </div>
+
+        <div class="column">
+            <div class="column-header">
+                <div class="column-title">✅ Done</div>
+                <div class="task-count" id="done-count">0</div>
+            </div>
+            <div id="done-tasks"></div>
+        </div>
+    </div>
+
+    <script>
+        // Embedded task data - ALL 88 TASKS
+        const taskData = {
+        "tasks": [
+                {
+                        "id": "TASK-001",
+                        "title": "Initialize Git repository",
+                        "status": "review",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "chris-aldworth",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T20:46:30.309Z",
+                        "estimatedHours": 1,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "COMPLETED: Git repository initialized, project structure cleaned (2,810→66 files), SSH keys configured, GitHub sync successful, hosting research completed - ready for development!",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-002",
+                        "title": "Set up project structure",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 4,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create folder structure for frontend, backend, and shared components",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-003",
+                        "title": "Configure development environment",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 6,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Set up development tools, linters, and IDE configuration",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-004",
+                        "title": "Set up CI/CD pipeline",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Configure automated testing, building, and deployment pipeline",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-005",
+                        "title": "Configure Cursor AI integration",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 4,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Set up Cursor AI for code assistance and task management",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-006",
+                        "title": "Set up database (PostgreSQL + PostGIS)",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Configure PostgreSQL with PostGIS extension for geospatial data",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-007",
+                        "title": "Configure Redis for caching",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 4,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Set up Redis for session management and caching",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-008",
+                        "title": "Set up file storage (AWS S3)",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 6,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Configure AWS S3 for photo storage and CDN integration",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-009",
+                        "title": "Configure map services (Mapbox)",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 6,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Set up Mapbox API keys and map configuration",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-010",
+                        "title": "Set up monitoring and logging",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 6,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Configure application monitoring and centralized logging",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-011",
+                        "title": "Set up Express.js server",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create Express.js server with middleware and basic routing",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-012",
+                        "title": "Configure database models",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Define database schemas for users, photos, and locations",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-013",
+                        "title": "Implement authentication system",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Set up JWT authentication and user management",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-014",
+                        "title": "Set up API routes structure",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create RESTful API endpoints for all major features",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-015",
+                        "title": "Implement error handling middleware",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 6,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Set up comprehensive error handling and logging",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-016",
+                        "title": "Set up React Native project",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Initialize React Native project with TypeScript and navigation",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-017",
+                        "title": "Configure navigation structure",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 6,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Set up React Navigation with tab and stack navigators",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-018",
+                        "title": "Set up state management (Zustand)",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 6,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Configure Zustand for global state management",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-019",
+                        "title": "Configure map integration (Mapbox)",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Integrate Mapbox GL JS for interactive maps",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-020",
+                        "title": "Set up testing framework",
+                        "status": "todo",
+                        "phase": "Phase 1",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Configure Jest and React Native Testing Library",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-021",
+                        "title": "User registration and login",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Implement user registration, login, and session management",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-022",
+                        "title": "User profile management",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create user profile pages and editing functionality",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-023",
+                        "title": "Password reset functionality",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Implement secure password reset with email verification",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-024",
+                        "title": "User statistics and activity tracking",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "low",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 10,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Track user activity and generate statistics",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-025",
+                        "title": "Role-based access control",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Implement admin and user role permissions",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-026",
+                        "title": "Photo upload interface",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create drag-and-drop photo upload interface",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-027",
+                        "title": "Image processing and optimization",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 20,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Implement image resizing, compression, and format conversion",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-028",
+                        "title": "Decade selection functionality",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create decade picker for photo dating",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-029",
+                        "title": "Location pin placement",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Implement drag-and-drop location pin placement",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-030",
+                        "title": "EXIF data extraction and validation",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 10,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Extract and validate EXIF data from uploaded photos",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-031",
+                        "title": "Batch upload functionality",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Allow multiple photo uploads with progress tracking",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-032",
+                        "title": "Upload progress tracking",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Show upload progress and handle failures gracefully",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-033",
+                        "title": "Interactive world map",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 20,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create interactive world map with zoom and pan controls",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-034",
+                        "title": "Photo pin clustering",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Implement photo pin clustering for performance",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-035",
+                        "title": "Map zoom and pan controls",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Add smooth zoom and pan controls to map",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-036",
+                        "title": "Satellite view integration",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 6,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Add satellite and street view options",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-037",
+                        "title": "Location-based photo display",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Display photos based on map location and zoom level",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-038",
+                        "title": "Map performance optimization",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Optimize map rendering for large numbers of photos",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-039",
+                        "title": "Time slider component",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create interactive time slider for decade navigation",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-040",
+                        "title": "Decade-based filtering",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Filter photos by decade selection",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-041",
+                        "title": "Time animation controls",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 10,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Add play/pause controls for time animation",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-042",
+                        "title": "Timeline visualization",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create visual timeline showing photo distribution",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-043",
+                        "title": "Time-based photo queries",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Optimize database queries for time-based filtering",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-044",
+                        "title": "Text search functionality",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Implement full-text search for photos and metadata",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-045",
+                        "title": "Advanced filtering options",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Add filters for location, date, tags, and user",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-046",
+                        "title": "Search suggestions and autocomplete",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 10,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Implement search suggestions and autocomplete",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-047",
+                        "title": "Related content discovery",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "low",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Show related photos based on location and tags",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-048",
+                        "title": "Search result optimization",
+                        "status": "todo",
+                        "phase": "Phase 2",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Optimize search performance and result ranking",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-049",
+                        "title": "Admin dashboard",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create comprehensive admin dashboard",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-050",
+                        "title": "User management interface",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Admin interface for user account management",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-051",
+                        "title": "Content moderation system",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "System for reviewing and moderating uploaded content",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-052",
+                        "title": "System analytics and reporting",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Analytics dashboard for system usage and performance",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-053",
+                        "title": "Bulk operations interface",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 10,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Interface for bulk content operations",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-054",
+                        "title": "Photo editing and metadata management",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 14,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Allow editing of photo metadata and descriptions",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-055",
+                        "title": "Content curation tools",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Tools for curating and featuring content",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-056",
+                        "title": "Featured content system",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "low",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "System for featuring high-quality content",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-057",
+                        "title": "Content approval workflow",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 10,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Workflow for content approval and publishing",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-058",
+                        "title": "Content archiving and deletion",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "System for archiving and deleting content",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-059",
+                        "title": "Database query optimization",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Optimize database queries for better performance",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-060",
+                        "title": "Image caching and CDN integration",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Implement image caching and CDN for faster loading",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-061",
+                        "title": "Map rendering optimization",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 14,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Optimize map rendering for better performance",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-062",
+                        "title": "API response time optimization",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 10,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Optimize API endpoints for faster response times",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-063",
+                        "title": "Mobile performance optimization",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Optimize mobile app performance and battery usage",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-064",
+                        "title": "Touch gesture optimization",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 10,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Optimize touch gestures for mobile devices",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-065",
+                        "title": "Offline functionality",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "low",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Implement offline photo viewing and basic functionality",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-066",
+                        "title": "Push notifications",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "low",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Implement push notifications for user engagement",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-067",
+                        "title": "Mobile-specific UI improvements",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 14,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Optimize UI for mobile devices and different screen sizes",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-068",
+                        "title": "App store optimization",
+                        "status": "todo",
+                        "phase": "Phase 3",
+                        "priority": "low",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Optimize app for app store submission and discovery",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-069",
+                        "title": "Comprehensive testing suite",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 20,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create comprehensive test suite for all features",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-070",
+                        "title": "Performance testing",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Conduct performance testing and optimization",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-071",
+                        "title": "Security testing and penetration testing",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Conduct security testing and vulnerability assessment",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-072",
+                        "title": "User acceptance testing",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 14,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Conduct user acceptance testing with beta users",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-073",
+                        "title": "Bug fixes and optimization",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Fix bugs and optimize based on testing results",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-074",
+                        "title": "Production environment setup",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Set up production environment and infrastructure",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-075",
+                        "title": "Database migration and backup",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Set up database migration and backup procedures",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-076",
+                        "title": "SSL certificate configuration",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 4,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Configure SSL certificates for secure connections",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-077",
+                        "title": "CDN and caching setup",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 6,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Set up CDN and caching for optimal performance",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-078",
+                        "title": "Monitoring and alerting configuration",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Set up monitoring and alerting for production",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-079",
+                        "title": "Documentation completion",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Complete technical and user documentation",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-080",
+                        "title": "User guide and tutorials",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 10,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Create user guides and tutorial videos",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-081",
+                        "title": "Marketing materials preparation",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "low",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Prepare marketing materials and press kit",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-082",
+                        "title": "App store submission",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 6,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Submit app to app stores for review",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-083",
+                        "title": "Launch day preparation",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Prepare for launch day and support team",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-084",
+                        "title": "Launch monitoring and support",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 16,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Monitor launch and provide user support",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-085",
+                        "title": "User feedback collection",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "medium",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Collect and analyze user feedback",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-086",
+                        "title": "Performance monitoring",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 10,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Monitor system performance and user experience",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-087",
+                        "title": "Bug fixes and hotfixes",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "high",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 12,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Fix critical bugs and deploy hotfixes",
+                        "acceptanceCriteria": []
+                },
+                {
+                        "id": "TASK-088",
+                        "title": "Feature enhancement planning",
+                        "status": "todo",
+                        "phase": "Phase 4",
+                        "priority": "low",
+                        "assignee": "",
+                        "created": "2025-09-19T16:38:29.450Z",
+                        "updated": "2025-09-19T16:38:29.450Z",
+                        "estimatedHours": 8,
+                        "actualHours": 0,
+                        "dependencies": [],
+                        "description": "Plan future feature enhancements based on feedback",
+                        "acceptanceCriteria": []
+                }
+        ],
+        "columns": {
+                "backlog": [],
+                "todo": [
+                        "TASK-002",
+                        "TASK-003",
+                        "TASK-004",
+                        "TASK-005",
+                        "TASK-006",
+                        "TASK-007",
+                        "TASK-008",
+                        "TASK-009",
+                        "TASK-010",
+                        "TASK-011",
+                        "TASK-012",
+                        "TASK-013",
+                        "TASK-014",
+                        "TASK-015",
+                        "TASK-016",
+                        "TASK-017",
+                        "TASK-018",
+                        "TASK-019",
+                        "TASK-020",
+                        "TASK-021",
+                        "TASK-022",
+                        "TASK-023",
+                        "TASK-024",
+                        "TASK-025",
+                        "TASK-026",
+                        "TASK-027",
+                        "TASK-028",
+                        "TASK-029",
+                        "TASK-030",
+                        "TASK-031",
+                        "TASK-032",
+                        "TASK-033",
+                        "TASK-034",
+                        "TASK-035",
+                        "TASK-036",
+                        "TASK-037",
+                        "TASK-038",
+                        "TASK-039",
+                        "TASK-040",
+                        "TASK-041",
+                        "TASK-042",
+                        "TASK-043",
+                        "TASK-044",
+                        "TASK-045",
+                        "TASK-046",
+                        "TASK-047",
+                        "TASK-048",
+                        "TASK-049",
+                        "TASK-050",
+                        "TASK-051",
+                        "TASK-052",
+                        "TASK-053",
+                        "TASK-054",
+                        "TASK-055",
+                        "TASK-056",
+                        "TASK-057",
+                        "TASK-058",
+                        "TASK-059",
+                        "TASK-060",
+                        "TASK-061",
+                        "TASK-062",
+                        "TASK-063",
+                        "TASK-064",
+                        "TASK-065",
+                        "TASK-066",
+                        "TASK-067",
+                        "TASK-068",
+                        "TASK-069",
+                        "TASK-070",
+                        "TASK-071",
+                        "TASK-072",
+                        "TASK-073",
+                        "TASK-074",
+                        "TASK-075",
+                        "TASK-076",
+                        "TASK-077",
+                        "TASK-078",
+                        "TASK-079",
+                        "TASK-080",
+                        "TASK-081",
+                        "TASK-082",
+                        "TASK-083",
+                        "TASK-084",
+                        "TASK-085",
+                        "TASK-086",
+                        "TASK-087",
+                        "TASK-088"
+                ],
+                "in-progress": [],
+                "review": [
+                        "TASK-001"
+                ],
+                "done": []
+        },
+        "metadata": {
+                "lastUpdated": "2025-09-19T20:46:30.310Z",
+                "version": "1.0.0",
+                "totalTasks": 88,
+                "phases": {
+                        "Phase 1": 20,
+                        "Phase 2": 28,
+                        "Phase 3": 20,
+                        "Phase 4": 20
+                }
+        }
+};
+
+        function loadTasks() {
+            try {
+                const tasks = taskData.tasks;
+                const columns = taskData.columns;
+                
+                // Clear all columns
+                Object.keys(columns).forEach(column => {
+                    const container = document.getElementById(`${column}-tasks`);
+                    if (container) container.innerHTML = '';
+                });
+                
+                // Add tasks to columns
+                tasks.forEach(task => {
+                    const taskElement = createTaskElement(task);
+                    const container = document.getElementById(`${task.status}-tasks`);
+                    if (container) {
+                        container.appendChild(taskElement);
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading tasks:', error);
+            }
+        }
+
+        function createTaskElement(task) {
+            const taskDiv = document.createElement('div');
+            taskDiv.className = `task ${task.priority}-priority`;
+            
+            const priorityEmoji = {
+                'high': '🔴',
+                'medium': '🟡',
+                'low': '🟢'
+            };
+            
+            taskDiv.innerHTML = `
+                <div class="task-id">${priorityEmoji[task.priority]} ${task.id} <span class="phase-badge">${task.phase}</span></div>
+                <div class="task-title">${task.title}</div>
+                <div class="task-meta">
+                    <span class="task-assignee">👤 ${task.assignee}</span>
+                    <span class="task-hours">⏱️ ${task.estimatedHours}h</span>
+                </div>
+                <div class="task-description">${task.description}</div>
+            `;
+            
+            return taskDiv;
+        }
+
+        // Load tasks when page loads
+        document.addEventListener('DOMContentLoaded', loadTasks);
+    </script>
+</body>
+</html>
