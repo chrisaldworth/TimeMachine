@@ -52,6 +52,8 @@ program
   .option('-a, --assignee <assignee>', 'Task assignee')
   .option('-h, --hours <hours>', 'Estimated hours')
   .option('-d, --description <description>', 'Task description')
+  .option('--requirements <requirements>', 'Related requirements (comma-separated)')
+  .option('--usecases <usecases>', 'Related use cases (comma-separated)')
   .action(async (title, options) => {
     const tasks = await loadTasks();
     const taskId = generateTaskId(tasks);
@@ -69,7 +71,9 @@ program
       actualHours: 0,
       dependencies: [],
       description: options.description || '',
-      acceptanceCriteria: []
+      acceptanceCriteria: [],
+      requirements: options.requirements ? options.requirements.split(',').map(r => r.trim()) : [],
+      useCases: options.usecases ? options.usecases.split(',').map(u => u.trim()) : []
     };
     
     tasks.tasks.push(newTask);

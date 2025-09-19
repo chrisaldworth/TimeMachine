@@ -24,9 +24,18 @@ echo "======================================="
 # Navigate to project root
 cd "$(dirname "$0")/.."
 
-# Create task
+# Create task with requirement and use case linking
 echo "📋 Creating task..."
-TASK_OUTPUT=$(node project-management/task-manager.js create "$TASK_DESCRIPTION" 2>&1)
+echo "🔗 Linking to requirements and use cases..."
+
+# Extract task number for linking
+TASK_NUMBER=$(echo "$TASK_DESCRIPTION" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9 ]//g' | sed 's/  */ /g' | sed 's/ /-/g' | cut -c1-10)
+
+# Create requirement and use case references
+REQUIREMENTS="REQ-XXX-$TASK_NUMBER"
+USE_CASES="UC-XXX-$TASK_NUMBER,DEV-UC-XXX-$TASK_NUMBER"
+
+TASK_OUTPUT=$(node project-management/task-manager.js create "$TASK_DESCRIPTION" --requirements "$REQUIREMENTS" --usecases "$USE_CASES" 2>&1)
 
 # Extract task ID from output
 TASK_ID=$(echo "$TASK_OUTPUT" | grep -oE "TASK-[0-9]{3}" | head -1)
