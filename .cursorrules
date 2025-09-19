@@ -13,29 +13,54 @@ Never do these without first creating/updating a task:
 - Refactor code
 - Update dependencies
 - Change configurations
+- Create new files
+- Modify existing files
+- Update documentation
+- Change project structure
 
 ## ✅ **MANDATORY WORKFLOW**
 
 ### Before Starting Any Work:
-1. Create task: `@cursor Create a new task for: [description]`
-2. Move to in-progress: `@cursor Move task TASK-XXX to in-progress`
-3. Update assignee: `@cursor Update task TASK-XXX with: assignee=developer-name`
+1. Create requirements: `@cursor Create requirements for: [feature description]`
+2. Create use cases: `@cursor Create use cases for: [feature description]`
+3. Create task: `@cursor Create a new task for: [description]`
+4. Link requirements: `@cursor Link task TASK-XXX to requirements: REQ-XXX-001,REQ-XXX-002`
+5. Link use cases: `@cursor Link task TASK-XXX to use cases: UC-XXX-001,DEV-UC-XXX-001`
+6. Create branch: `@cursor Create branch for task TASK-XXX`
+7. Move to in-progress: `@cursor Move task TASK-XXX to in-progress`
 
 ### During Development:
 1. Update progress: `@cursor Update task TASK-XXX with: actualHours=4, description="Progress update"`
 2. Move to review when ready: `@cursor Move task TASK-XXX to review`
 
 ### After Completion:
-1. Move to done: `@cursor Move task TASK-XXX to done`
-2. Update final details: `@cursor Update task TASK-XXX with: actualHours=8, description="Completed"`
+1. Create Pull Request: `@cursor Create PR for task TASK-XXX`
+2. Move to review: `@cursor Move task TASK-XXX to review`
+3. After PR approval: `@cursor Merge PR for task TASK-XXX`
+4. Move to done: `@cursor Move task TASK-XXX to done`
+5. Update final details: `@cursor Update task TASK-XXX with: actualHours=8, description="Completed"`
 
 ## 🎯 **REQUIRED CURSOR COMMANDS**
+
+### Requirements & Use Cases:
+```
+@cursor Create requirements for: implementing user authentication system
+@cursor Create use cases for: implementing user authentication system
+@cursor Create developer use cases for: implementing user authentication system
+```
 
 ### Task Creation:
 ```
 @cursor Create a new task for: implementing user authentication system
 @cursor Create a new task for: fixing photo upload bug in mobile app
 @cursor Create a new task for: adding dark mode toggle to settings
+```
+
+### Task Linking:
+```
+@cursor Link task TASK-026 to requirements: REQ-026-001,REQ-026-002
+@cursor Link task TASK-026 to use cases: UC-026-001,DEV-UC-026-001
+@cursor Link task TASK-026 to acceptance criteria: AC-026-001,AC-026-002
 ```
 
 ### Task Updates:
@@ -49,6 +74,15 @@ Never do these without first creating/updating a task:
 @cursor Move task TASK-026 to in-progress
 @cursor Move task TASK-039 to review
 @cursor Move task TASK-033 to done
+```
+
+### Git Branching:
+```
+@cursor Create branch for task TASK-026: feature/TASK-026-photo-upload-interface
+@cursor Switch to branch: feature/TASK-026-photo-upload-interface
+@cursor Create PR for task TASK-026
+@cursor Merge PR for task TASK-026
+@cursor Delete branch: feature/TASK-026-photo-upload-interface
 ```
 
 ### Progress Tracking:
@@ -97,6 +131,57 @@ Never do these without first creating/updating a task:
 ```
 @cursor Generate progress report
 @cursor List all tasks in in-progress
+```
+
+## 🚨 **ENFORCEMENT RULES**
+
+### **Git Hooks Enforce:**
+- ❌ **No commits without task IDs** - All commits must include TASK-XXX
+- ❌ **No direct commits to main** - All work must be in feature branches
+- ❌ **No invalid branch names** - Must follow type/TASK-XXX-description format
+- ❌ **No commits without proper format** - Must use conventional commits
+
+### **Task Management Enforces:**
+- ❌ **No work without requirements** - Every task must have linked requirements
+- ❌ **No work without use cases** - Every task must have user and developer use cases
+- ❌ **No work without acceptance criteria** - Every task must have clear completion criteria
+- ❌ **No work without proper status** - Tasks must be in correct workflow status
+
+### **Documentation Enforces:**
+- ❌ **No features without documentation** - All features must be documented
+- ❌ **No code without comments** - All code must be properly commented
+- ❌ **No APIs without documentation** - All APIs must be documented
+- ❌ **No changes without README updates** - Documentation must be kept current
+
+## 🎯 **COMPLETE WORKFLOW EXAMPLE**
+
+```bash
+# 1. Create requirements and use cases
+@cursor Create requirements for: implementing photo upload interface
+@cursor Create use cases for: implementing photo upload interface
+@cursor Create developer use cases for: implementing photo upload interface
+
+# 2. Create task with linking
+@cursor Create a new task for: implementing photo upload interface
+@cursor Link task TASK-026 to requirements: REQ-026-001,REQ-026-002
+@cursor Link task TASK-026 to use cases: UC-026-001,DEV-UC-026-001
+
+# 3. Create branch and start work
+@cursor Create branch for task TASK-026: feature/TASK-026-photo-upload-interface
+@cursor Move task TASK-026 to in-progress
+
+# 4. Work and commit (Git hooks will validate)
+git add .
+git commit -m "feat(TASK-026): implement drag-and-drop photo upload"
+
+# 5. Complete and review
+@cursor Move task TASK-026 to review
+@cursor Create PR for task TASK-026
+
+# 6. After approval
+@cursor Merge PR for task TASK-026
+@cursor Move task TASK-026 to done
+@cursor Delete branch: feature/TASK-026-photo-upload-interface
 ```
 
 **REMEMBER: NO WORK WITHOUT TICKETS! EVERY LINE OF CODE MUST BE TRACKED!** 🎯
