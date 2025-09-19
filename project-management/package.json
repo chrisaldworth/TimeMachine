@@ -1,0 +1,31 @@
+{
+  "name": "rewind-task-manager",
+  "version": "1.0.0",
+  "description": "Task management system for Rewind the Map project",
+  "main": "task-manager.js",
+  "type": "module",
+  "bin": {
+    "task": "./task-manager.js"
+  },
+  "scripts": {
+    "start": "node task-manager.js",
+    "import": "node import-tasks.js",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "task-management",
+    "kanban",
+    "project-management",
+    "cursor-ai"
+  ],
+  "author": "Chris Aldworth",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.0.0",
+    "inquirer": "^9.2.0",
+    "chalk": "^4.1.2"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  }
+}

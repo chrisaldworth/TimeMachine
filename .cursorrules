@@ -1,0 +1,102 @@
+# 🎯 Cursor Rules - Rewind the Map Project
+
+## 📋 **CORE RULE: NO WORK WITHOUT TICKETS**
+
+**CRITICAL:** All development work MUST be tracked through the task management system.
+
+## 🚫 **PROHIBITED ACTIONS WITHOUT TICKETS**
+
+Never do these without first creating/updating a task:
+- Write new code
+- Fix bugs  
+- Add features
+- Refactor code
+- Update dependencies
+- Change configurations
+
+## ✅ **MANDATORY WORKFLOW**
+
+### Before Starting Any Work:
+1. Create task: `@cursor Create a new task for: [description]`
+2. Move to in-progress: `@cursor Move task TASK-XXX to in-progress`
+3. Update assignee: `@cursor Update task TASK-XXX with: assignee=developer-name`
+
+### During Development:
+1. Update progress: `@cursor Update task TASK-XXX with: actualHours=4, description="Progress update"`
+2. Move to review when ready: `@cursor Move task TASK-XXX to review`
+
+### After Completion:
+1. Move to done: `@cursor Move task TASK-XXX to done`
+2. Update final details: `@cursor Update task TASK-XXX with: actualHours=8, description="Completed"`
+
+## 🎯 **REQUIRED CURSOR COMMANDS**
+
+### Task Creation:
+```
+@cursor Create a new task for: implementing user authentication system
+@cursor Create a new task for: fixing photo upload bug in mobile app
+@cursor Create a new task for: adding dark mode toggle to settings
+```
+
+### Task Updates:
+```
+@cursor Update task TASK-026 with: assignee=frontend-dev, hours=16
+@cursor Update task TASK-039 with: actualHours=8, description="Time slider animation completed"
+```
+
+### Task Movement:
+```
+@cursor Move task TASK-026 to in-progress
+@cursor Move task TASK-039 to review
+@cursor Move task TASK-033 to done
+```
+
+### Progress Tracking:
+```
+@cursor Generate progress report for Phase 1
+@cursor List all tasks in in-progress
+@cursor Show details for task TASK-026
+```
+
+## 🔧 **GIT INTEGRATION RULES**
+
+### Commit Message Format:
+- MUST include task ID: `feat(TASK-026): implement photo upload interface`
+- MUST use conventional commits: `type(TASK-XXX): description`
+
+### Branch Naming:
+- MUST include task ID: `feature/TASK-026-photo-upload`
+- MUST be descriptive: `fix/TASK-039-time-slider-bug`
+
+### Pull Request Titles:
+- MUST reference task ID: `TASK-026: Photo Upload Interface`
+- MUST be descriptive and clear
+
+## 🎯 **QUICK REFERENCE**
+
+### Start New Work:
+```
+@cursor Create a new task for: [work description]
+@cursor Move task TASK-XXX to in-progress
+@cursor Update task TASK-XXX with: assignee=my-name
+```
+
+### Update Progress:
+```
+@cursor Update task TASK-XXX with: actualHours=4, description="Progress update"
+```
+
+### Complete Work:
+```
+@cursor Move task TASK-XXX to review
+@cursor Update task TASK-XXX with: actualHours=8, description="Completed"
+@cursor Move task TASK-XXX to done
+```
+
+### Check Status:
+```
+@cursor Generate progress report
+@cursor List all tasks in in-progress
+```
+
+**REMEMBER: NO WORK WITHOUT TICKETS! EVERY LINE OF CODE MUST BE TRACKED!** 🎯
