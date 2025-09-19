@@ -3,6 +3,50 @@
 # Pre-commit hook for ticket-first development
 echo "🔍 Checking staged changes for ticket-first development rules..."
 
+# Get current branch name
+CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+
+# Check if we're on main branch
+if [ "$CURRENT_BRANCH" = "main" ]; then
+    echo "❌ ERROR: Direct commits to 'main' branch are not allowed!"
+    echo ""
+    echo "🎯 Required workflow:"
+    echo "   1. Create a branch for your task:"
+    echo "      git checkout -b feature/TASK-XXX-description"
+    echo "   2. Work on your task in the branch"
+    echo "   3. Create a Pull Request for review"
+    echo "   4. Merge PR to main after approval"
+    echo ""
+    echo "📋 Branch naming format: type/TASK-XXX-short-description"
+    echo "   Examples:"
+    echo "     feature/TASK-026-photo-upload-interface"
+    echo "     fix/TASK-039-time-slider-bug"
+    echo "     docs/TASK-001-project-setup"
+    echo ""
+    exit 1
+fi
+
+# Check if branch name follows convention
+if ! echo "$CURRENT_BRANCH" | grep -qE "^(feature|fix|docs|refactor|test|chore)/TASK-[0-9]{3}-"; then
+    echo "❌ ERROR: Branch name doesn't follow convention!"
+    echo ""
+    echo "📋 Current branch: $CURRENT_BRANCH"
+    echo "📋 Required format: type/TASK-XXX-short-description"
+    echo ""
+    echo "🎯 Valid types: feature, fix, docs, refactor, test, chore"
+    echo "📝 Examples:"
+    echo "   feature/TASK-026-photo-upload-interface"
+    echo "   fix/TASK-039-time-slider-bug"
+    echo "   docs/TASK-001-project-setup"
+    echo ""
+    echo "🔧 To fix:"
+    echo "   git checkout -b feature/TASK-XXX-description"
+    echo ""
+    exit 1
+fi
+
+echo "✅ Branch validation passed: $CURRENT_BRANCH"
+
 # Get staged files
 STAGED_FILES=$(git diff --cached --name-only)
 
