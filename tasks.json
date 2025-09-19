@@ -1,0 +1,32 @@
+{
+  "tasks": [
+    {
+      "id": "TASK--Infinity",
+      "title": "set up project structure",
+      "status": "todo",
+      "phase": "Phase 1",
+      "priority": "medium",
+      "assignee": "",
+      "created": "2025-09-19T21:08:58.340Z",
+      "updated": "2025-09-19T21:08:58.340Z",
+      "estimatedHours": 0,
+      "actualHours": 0,
+      "dependencies": [],
+      "description": "",
+      "acceptanceCriteria": []
+    }
+  ],
+  "columns": {
+    "backlog": [],
+    "todo": [
+      "TASK--Infinity"
+    ],
+    "in-progress": [],
+    "review": [],
+    "done": []
+  },
+  "metadata": {
+    "lastUpdated": "2025-09-19T21:08:58.340Z",
+    "version": "1.0.0"
+  }
+}

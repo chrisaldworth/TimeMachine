@@ -217,6 +217,8 @@ program
   .option('-h, --hours <hours>', 'Update estimated hours')
   .option('-r, --priority <priority>', 'Update priority')
   .option('-p, --phase <phase>', 'Update phase')
+  .option('--requirements <requirements>', 'Update related requirements (comma-separated)')
+  .option('--usecases <usecases>', 'Update related use cases (comma-separated)')
   .action(async (taskId, options) => {
     const tasks = await loadTasks();
     const task = tasks.tasks.find(t => t.id === taskId);
@@ -232,6 +234,8 @@ program
     if (options.hours) task.estimatedHours = parseInt(options.hours);
     if (options.priority) task.priority = options.priority;
     if (options.phase) task.phase = options.phase;
+    if (options.requirements) task.requirements = options.requirements.split(',').map(r => r.trim());
+    if (options.usecases) task.useCases = options.usecases.split(',').map(u => u.trim());
     
     task.updated = new Date().toISOString();
     
