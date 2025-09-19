@@ -26,7 +26,7 @@ export interface Photo {
   };
   locationConfidence: 'exact' | 'approximate' | 'estimated';
   license: string;
-  exif?: Record<string, any>;
+  exif?: Record<string, unknown>;
   createdAt: string;
   updatedAt: string;
   processedVariants: string[];
@@ -34,7 +34,7 @@ export interface Photo {
   softDeletedAt?: string;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;

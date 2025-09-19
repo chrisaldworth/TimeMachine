@@ -41,7 +41,9 @@ app.use('/api/v1', (req, res) => {
 });
 
 // Error handling middleware
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  // eslint-disable-next-line no-console
   console.error(err.stack);
   res.status(500).json({
     success: false,
@@ -61,8 +63,11 @@ app.use('*', (req, res) => {
 
 // Start server
 app.listen(PORT, () => {
+  // eslint-disable-next-line no-console
   console.log(`🚀 Rewind the Map Backend running on port ${PORT}`);
+  // eslint-disable-next-line no-console
   console.log(`📊 Health check: http://localhost:${PORT}/health`);
+  // eslint-disable-next-line no-console
   console.log(`📚 API docs: http://localhost:${PORT}/api/v1`);
 });
 

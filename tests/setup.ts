@@ -16,7 +16,7 @@ afterAll(() => {
 });
 
 // Global test utilities
-global.testUtils = {
+(global as any).testUtils = {
   generateTestUser: () => ({
     id: 'test-user-id',
     email: 'test@example.com',

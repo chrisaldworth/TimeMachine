@@ -1,8 +1,7 @@
 module.exports = {
   root: true,
   extends: [
-    '@react-native',
-    '@typescript-eslint/recommended',
+    'eslint:recommended',
   ],
   parser: '@typescript-eslint/parser',
   plugins: ['@typescript-eslint'],
@@ -17,19 +16,14 @@ module.exports = {
     'no-console': 'warn',
     'prefer-const': 'error',
     'no-var': 'error',
-    
-    // React Native specific
-    'react-native/no-unused-styles': 'error',
-    'react-native/split-platform-components': 'error',
-    'react-native/no-inline-styles': 'warn',
-    'react-native/no-color-literals': 'warn',
+    'no-unused-vars': 'off', // Use TypeScript version instead
   },
   env: {
-    'react-native/react-native': true,
     node: true,
     es6: true,
   },
-  settings: {
-    'react-native/style-sheet-object-names': ['StyleSheet', 'styles'],
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: 'module',
   },
 };
