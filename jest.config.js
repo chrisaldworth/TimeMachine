@@ -17,7 +17,7 @@ module.exports = {
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
   setupFilesAfterEnv: ['<rootDir>/tests/setup.ts'],
-  moduleNameMapping: {
+  moduleNameMapper: {
     '^@rewind/shared$': '<rootDir>/src/shared/src',
     '^@rewind/shared/(.*)$': '<rootDir>/src/shared/src/$1',
   },

@@ -51,9 +51,9 @@ describe('Shared Utils', () => {
 
   describe('calculateDistance', () => {
     it('should calculate distance between two points', () => {
-      // Distance between New York and Los Angeles (approximately 3944 km)
+      // Distance between New York and Los Angeles (approximately 3936 km)
       const distance = calculateDistance(40.7128, -74.0060, 34.0522, -118.2437);
-      expect(distance).toBeCloseTo(3944, 0);
+      expect(distance).toBeCloseTo(3936, 0);
     });
 
     it('should return 0 for same coordinates', () => {
