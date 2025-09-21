@@ -1,4 +1,4 @@
-import { cacheService, CacheService } from './cache';
+import { CacheService } from './cache';
 
 // Geospatial cache interface
 export interface GeospatialCacheData {
@@ -85,7 +85,7 @@ export class GeospatialCacheService {
       // Check if data is still valid
       const now = new Date();
       const age = (now.getTime() - data.timestamp.getTime()) / 1000;
-      
+
       if (age > data.ttl) {
         await this.cache.delete(key);
         return null;
@@ -147,7 +147,7 @@ export class GeospatialCacheService {
       // Check if data is still valid
       const now = new Date();
       const age = (now.getTime() - data.timestamp.getTime()) / 1000;
-      
+
       if (age > data.ttl) {
         await this.cache.delete(key);
         return null;
@@ -199,7 +199,7 @@ export class GeospatialCacheService {
       // Check if data is still valid
       const now = new Date();
       const age = (now.getTime() - data.timestamp.getTime()) / 1000;
-      
+
       if (age > data.ttl) {
         await this.cache.delete(key);
         return null;
@@ -262,7 +262,7 @@ export class GeospatialCacheService {
       // Check if data is still valid
       const now = new Date();
       const age = (now.getTime() - data.timestamp.getTime()) / 1000;
-      
+
       if (age > data.ttl) {
         await this.cache.delete(key);
         return null;

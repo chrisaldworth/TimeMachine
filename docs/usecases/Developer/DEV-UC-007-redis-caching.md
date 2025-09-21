@@ -2,11 +2,11 @@
 
 ## 👨‍💻 **Developer Use Case: Redis Caching Setup and Configuration**
 
-**Actor:** Backend Developer / DevOps Engineer  
-**Goal:** Set up Redis for session management, application caching, and performance optimization  
-**Context:** Development environment with Docker, Redis server, and Node.js backend  
-**Priority:** High  
-**Estimated Time:** 4 hours  
+**Actor:** Backend Developer / DevOps Engineer
+**Goal:** Set up Redis for session management, application caching, and performance optimization
+**Context:** Development environment with Docker, Redis server, and Node.js backend
+**Priority:** High
+**Estimated Time:** 4 hours
 
 ## 📋 **Preconditions**
 - TASK-006 (Database Setup) is completed

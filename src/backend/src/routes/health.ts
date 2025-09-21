@@ -1,8 +1,8 @@
 import express from 'express';
 import { getRedisHealth } from '../config/redis';
 import { cacheService } from '../services/cache';
-import { sessionService } from '../services/session';
 import { geospatialCacheService } from '../services/geospatial-cache';
+import { sessionService } from '../services/session';
 
 const router = express.Router();
 
@@ -133,7 +133,7 @@ router.get('/cache', async (req, res) => {
 router.post('/cache/clear', async (req, res) => {
   try {
     const { pattern } = req.body;
-    
+
     if (!pattern) {
       return res.status(400).json({
         error: 'Pattern is required',
@@ -141,7 +141,7 @@ router.post('/cache/clear', async (req, res) => {
     }
 
     const clearedCount = await cacheService.clearPattern(pattern);
-    
+
     res.json({
       message: `Cleared ${clearedCount} cache entries`,
       pattern,
@@ -158,7 +158,7 @@ router.post('/cache/clear/geospatial', async (req, res) => {
   try {
     const { pattern } = req.body;
     const clearedCount = await geospatialCacheService.clearGeospatialCache(pattern || '*');
-    
+
     res.json({
       message: `Cleared ${clearedCount} geospatial cache entries`,
       pattern: pattern || '*',
@@ -175,7 +175,7 @@ router.post('/cache/clear/tiles', async (req, res) => {
   try {
     const { zoomLevel } = req.body;
     const clearedCount = await geospatialCacheService.clearMapTileCache(zoomLevel);
-    
+
     res.json({
       message: `Cleared ${clearedCount} map tile cache entries`,
       zoomLevel,
@@ -191,7 +191,7 @@ router.post('/cache/clear/tiles', async (req, res) => {
 router.post('/sessions/cleanup', async (req, res) => {
   try {
     const cleanedCount = await sessionService.cleanupExpiredSessions();
-    
+
     res.json({
       message: `Cleaned up ${cleanedCount} expired sessions`,
       cleanedCount,

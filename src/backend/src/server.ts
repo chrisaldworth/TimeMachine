@@ -1,11 +1,11 @@
-import express from 'express';
+import compression from 'compression';
 import cors from 'cors';
+import dotenv from 'dotenv';
+import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import compression from 'compression';
-import dotenv from 'dotenv';
-import { connectRedis, testRedisConnection } from './config/redis';
 import { testConnection } from './config/database';
+import { connectRedis, testRedisConnection } from './config/redis';
 import healthRoutes from './routes/health';
 
 // Load environment variables

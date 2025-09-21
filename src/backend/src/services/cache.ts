@@ -69,7 +69,7 @@ export class CacheService {
     try {
       const cacheKey = this.generateKey(key);
       const value = await this.client.get(cacheKey);
-      
+
       if (value === null) {
         return null;
       }
@@ -179,10 +179,10 @@ export class CacheService {
 
       // If not in cache, fetch from source
       const value = await fetcher();
-      
+
       // Store in cache
       await this.set(key, value, ttl);
-      
+
       return value;
     } catch (error) {
       console.error('❌ Cache getOrSet error:', error);
@@ -197,7 +197,7 @@ export class CacheService {
     try {
       const searchPattern = this.generateKey(pattern);
       const keys = await this.client.keys(searchPattern);
-      
+
       if (keys.length === 0) {
         return 0;
       }
@@ -221,10 +221,10 @@ export class CacheService {
     try {
       const info = await this.client.info('stats');
       const memory = await this.client.info('memory');
-      
+
       const stats = this.parseInfo(info);
       const memoryInfo = this.parseInfo(memory);
-      
+
       return {
         hitCount: parseInt(stats.keyspace_hits || '0'),
         missCount: parseInt(stats.keyspace_misses || '0'),
@@ -248,7 +248,7 @@ export class CacheService {
   private parseInfo(info: string): Record<string, string> {
     const result: Record<string, string> = {};
     const lines = info.split('\r\n');
-    
+
     for (const line of lines) {
       if (line && !line.startsWith('#')) {
         const [key, value] = line.split(':');
@@ -257,7 +257,7 @@ export class CacheService {
         }
       }
     }
-    
+
     return result;
   }
 
@@ -270,7 +270,7 @@ export class CacheService {
     photo: (id: string) => `photo:${id}`,
     photoList: (filters: string) => `photos:list:${filters}`,
     photoStats: (id: string) => `photo:stats:${id}`,
-    geospatial: (lat: number, lon: number, radius: number) => 
+    geospatial: (lat: number, lon: number, radius: number) =>
       `geo:${lat.toFixed(4)}:${lon.toFixed(4)}:${radius}`,
     mapTiles: (z: number, x: number, y: number) => `tile:${z}:${x}:${y}`,
     apiResponse: (endpoint: string, params: string) => `api:${endpoint}:${params}`,

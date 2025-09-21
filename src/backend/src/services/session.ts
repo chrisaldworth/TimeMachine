@@ -1,5 +1,5 @@
-import { randomBytes, createHash } from 'crypto';
-import { cacheService, CacheService } from './cache';
+import { createHash, randomBytes } from 'crypto';
+import { CacheService } from './cache';
 
 // Session interface
 export interface Session {
@@ -84,7 +84,7 @@ export class SessionService {
     // Store session in cache
     const cacheKey = CacheService.generateKeys.userSession(sessionId);
     const ttl = Math.floor((expiresAt.getTime() - now.getTime()) / 1000);
-    
+
     await this.cache.set(cacheKey, session, ttl);
 
     // Store user session mapping
@@ -190,11 +190,11 @@ export class SessionService {
     try {
       const pattern = `user:${userId}:sessions:*`;
       const keys = await this.cache.clearPattern(pattern);
-      
+
       // Also delete the sessions themselves
       const sessionPattern = `session:*`;
       const sessionKeys = await this.cache.clearPattern(sessionPattern);
-      
+
       return keys + sessionKeys;
     } catch (error) {
       console.error('❌ Delete user sessions error:', error);
@@ -221,14 +221,14 @@ export class SessionService {
   async refreshSession(sessionId: string, ttl?: number): Promise<boolean> {
     try {
       const session = await this.getSession(sessionId);
-      
+
       if (!session) {
         return false;
       }
 
       const newTTL = ttl || this.defaultTTL;
       const newExpiresAt = new Date(Date.now() + newTTL * 1000);
-      
+
       const updatedSession: Session = {
         ...session,
         expiresAt: newExpiresAt,
@@ -252,9 +252,9 @@ export class SessionService {
     try {
       const pattern = `user:${userId}:sessions:*`;
       const keys = await this.cache.clearPattern(pattern);
-      
+
       const sessions: Session[] = [];
-      
+
       for (const key of keys) {
         const sessionId = key.split(':').pop();
         if (sessionId) {
@@ -279,9 +279,9 @@ export class SessionService {
     try {
       const pattern = 'session:*';
       const keys = await this.cache.clearPattern(pattern);
-      
+
       let cleanedCount = 0;
-      
+
       for (const key of keys) {
         const session = await this.cache.get<Session>(key);
         if (session && new Date() > session.expiresAt) {
@@ -308,16 +308,16 @@ export class SessionService {
     try {
       const pattern = 'session:*';
       const keys = await this.cache.clearPattern(pattern);
-      
+
       let totalSessions = 0;
       let activeSessions = 0;
       let expiredSessions = 0;
-      
+
       for (const key of keys) {
         const session = await this.cache.get<Session>(key);
         if (session) {
           totalSessions++;
-          
+
           if (new Date() > session.expiresAt) {
             expiredSessions++;
           } else if (session.isActive) {

@@ -24,7 +24,7 @@ export interface RedisConfig {
 // Environment-based configuration
 const getRedisConfig = (): RedisConfig => {
   const env = process.env.NODE_ENV || 'development';
-  
+
   const baseConfig: RedisConfig = {
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379'),
@@ -149,11 +149,11 @@ export const getRedisHealth = async (): Promise<{
 }> => {
   try {
     const client = getRedisClient();
-    
+
     const info = await client.info('server');
     const memory = await client.info('memory');
     const stats = await client.info('stats');
-    
+
     return {
       status: 'healthy',
       info: parseRedisInfo(info),
@@ -175,7 +175,7 @@ export const getRedisHealth = async (): Promise<{
 const parseRedisInfo = (info: string): Record<string, string> => {
   const result: Record<string, string> = {};
   const lines = info.split('\r\n');
-  
+
   for (const line of lines) {
     if (line && !line.startsWith('#')) {
       const [key, value] = line.split(':');
@@ -184,7 +184,7 @@ const parseRedisInfo = (info: string): Record<string, string> => {
       }
     }
   }
-  
+
   return result;
 };
 
