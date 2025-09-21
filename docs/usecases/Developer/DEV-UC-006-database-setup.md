@@ -2,11 +2,11 @@
 
 ## 👨‍💻 **Developer Use Case: Database Setup and Configuration**
 
-**Actor:** Backend Developer / Database Administrator  
-**Goal:** Set up PostgreSQL database with PostGIS extension for geospatial data handling  
-**Context:** Development environment with Docker, local PostgreSQL, and production database  
-**Priority:** High  
-**Estimated Time:** 8 hours  
+**Actor:** Backend Developer / Database Administrator
+**Goal:** Set up PostgreSQL database with PostGIS extension for geospatial data handling
+**Context:** Development environment with Docker, local PostgreSQL, and production database
+**Priority:** High
+**Estimated Time:** 8 hours
 
 ## 📋 **Preconditions**
 - TASK-005 (Cursor AI Integration) is completed

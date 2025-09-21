@@ -2,14 +2,14 @@
 
 /**
  * Database Migration Script
- * 
+ *
  * This script handles database migrations for the Rewind the Map application.
  * It supports running migrations, rolling back, and checking migration status.
  */
 
-import { readFileSync, readdirSync, statSync } from 'fs';
-import { join, extname } from 'path';
-import { getPool, executeQuery } from '../config/database';
+import { readFileSync, readdirSync } from 'fs';
+import { extname, join } from 'path';
+import { executeQuery, getPool } from '../config/database';
 
 interface Migration {
   version: string;
@@ -66,11 +66,11 @@ class MigrationManager {
   async getStatus(): Promise<Migration[]> {
     const files = this.getMigrationFiles();
     const applied = await this.getAppliedMigrations();
-    
+
     const migrations: Migration[] = files.map(filename => {
       const version = filename.split('_')[0];
       const appliedMigration = applied.find(m => m.version === version);
-      
+
       return {
         version,
         filename,
@@ -98,11 +98,11 @@ class MigrationManager {
     const version = filename.split('_')[0];
     const migrationsDir = join(__dirname, '..', 'migrations');
     const filePath = join(migrationsDir, filename);
-    
+
     try {
       // Read migration file
       const sql = readFileSync(filePath, 'utf8');
-      
+
       // Check if already applied
       const applied = await this.getAppliedMigrations();
       if (applied.find(m => m.version === version)) {
@@ -111,24 +111,24 @@ class MigrationManager {
       }
 
       console.log(`🔄 Running migration ${version}: ${this.getMigrationDescription(filename)}`);
-      
+
       // Execute migration
       await executeQuery(sql);
-      
+
       // Record migration
       const recordQuery = `
         INSERT INTO migrations (version, filename, description)
         VALUES ($1, $2, $3)
       `;
-      
+
       await executeQuery(recordQuery, [
         version,
         filename,
         this.getMigrationDescription(filename)
       ]);
-      
+
       console.log(`✅ Migration ${version} completed successfully`);
-      
+
     } catch (error) {
       console.error(`❌ Migration ${version} failed:`, error);
       throw error;
@@ -140,29 +140,29 @@ class MigrationManager {
    */
   async runAll(): Promise<void> {
     console.log('🚀 Starting database migrations...');
-    
+
     await this.initialize();
-    
+
     const files = this.getMigrationFiles();
     const applied = await this.getAppliedMigrations();
     const appliedVersions = applied.map(m => m.version);
-    
+
     const pending = files.filter(filename => {
       const version = filename.split('_')[0];
       return !appliedVersions.includes(version);
     });
-    
+
     if (pending.length === 0) {
       console.log('✅ No pending migrations');
       return;
     }
-    
+
     console.log(`📋 Found ${pending.length} pending migrations`);
-    
+
     for (const filename of pending) {
       await this.runMigration(filename);
     }
-    
+
     console.log('🎉 All migrations completed successfully!');
   }
 
@@ -171,24 +171,24 @@ class MigrationManager {
    */
   async rollback(): Promise<void> {
     console.log('🔄 Rolling back last migration...');
-    
+
     const applied = await this.getAppliedMigrations();
     if (applied.length === 0) {
       console.log('✅ No migrations to rollback');
       return;
     }
-    
+
     const lastMigration = applied[applied.length - 1];
     console.log(`🔄 Rolling back migration ${lastMigration.version}`);
-    
+
     // Note: This is a simplified rollback - in production, you'd want
     // proper rollback scripts for each migration
     const rollbackQuery = `
       DELETE FROM migrations WHERE version = $1
     `;
-    
+
     await executeQuery(rollbackQuery, [lastMigration.version]);
-    
+
     console.log(`✅ Migration ${lastMigration.version} rolled back`);
   }
 
@@ -198,21 +198,21 @@ class MigrationManager {
   async showStatus(): Promise<void> {
     console.log('📊 Migration Status');
     console.log('==================');
-    
+
     const migrations = await this.getStatus();
-    
+
     migrations.forEach(migration => {
       const status = migration.applied ? '✅ Applied' : '⏳ Pending';
-      const appliedAt = migration.appliedAt 
-        ? ` (${migration.appliedAt.toISOString()})` 
+      const appliedAt = migration.appliedAt
+        ? ` (${migration.appliedAt.toISOString()})`
         : '';
-      
+
       console.log(`${status} ${migration.version}: ${migration.description}${appliedAt}`);
     });
-    
+
     const pendingCount = migrations.filter(m => !m.applied).length;
     const appliedCount = migrations.filter(m => m.applied).length;
-    
+
     console.log(`\n📈 Summary: ${appliedCount} applied, ${pendingCount} pending`);
   }
 
@@ -222,7 +222,7 @@ class MigrationManager {
   async reset(): Promise<void> {
     console.log('⚠️  WARNING: This will delete all data and reset the database!');
     console.log('This action cannot be undone.');
-    
+
     // In a real application, you'd want to add confirmation
     // For now, we'll just show what would happen
     console.log('🔄 Would drop all tables and re-run migrations...');
@@ -234,26 +234,26 @@ class MigrationManager {
 async function main() {
   const command = process.argv[2];
   const manager = new MigrationManager();
-  
+
   try {
     switch (command) {
       case 'up':
       case 'migrate':
         await manager.runAll();
         break;
-        
+
       case 'status':
         await manager.showStatus();
         break;
-        
+
       case 'rollback':
         await manager.rollback();
         break;
-        
+
       case 'reset':
         await manager.reset();
         break;
-        
+
       default:
         console.log('Usage: npm run migrate <command>');
         console.log('');

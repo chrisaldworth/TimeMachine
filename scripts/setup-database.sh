@@ -52,13 +52,13 @@ check_docker_compose() {
 # Start database services
 start_database() {
     print_status "Starting database services..."
-    
+
     # Start PostgreSQL and Redis
     docker-compose up -d postgres redis
-    
+
     # Wait for services to be healthy
     print_status "Waiting for database to be ready..."
-    
+
     # Wait for PostgreSQL
     timeout=60
     while [ $timeout -gt 0 ]; do
@@ -69,12 +69,12 @@ start_database() {
         sleep 2
         timeout=$((timeout - 2))
     done
-    
+
     if [ $timeout -le 0 ]; then
         print_error "PostgreSQL failed to start within 60 seconds"
         exit 1
     fi
-    
+
     # Wait for Redis
     timeout=30
     while [ $timeout -gt 0 ]; do
@@ -85,7 +85,7 @@ start_database() {
         sleep 2
         timeout=$((timeout - 2))
     done
-    
+
     if [ $timeout -le 0 ]; then
         print_error "Redis failed to start within 30 seconds"
         exit 1
@@ -95,25 +95,25 @@ start_database() {
 # Run database migrations
 run_migrations() {
     print_status "Running database migrations..."
-    
+
     # Install dependencies if needed
     if [ ! -d "node_modules" ]; then
         print_status "Installing dependencies..."
         npm install
     fi
-    
+
     # Run migrations
     cd src/backend
     npm run migrate
     cd ../..
-    
+
     print_success "Database migrations completed"
 }
 
 # Test database connection
 test_connection() {
     print_status "Testing database connection..."
-    
+
     # Test PostgreSQL connection
     if docker-compose exec postgres psql -U postgres -d rewind_the_map -c "SELECT 1;" > /dev/null 2>&1; then
         print_success "PostgreSQL connection test passed"
@@ -121,7 +121,7 @@ test_connection() {
         print_error "PostgreSQL connection test failed"
         exit 1
     fi
-    
+
     # Test PostGIS extension
     if docker-compose exec postgres psql -U postgres -d rewind_the_map -c "SELECT PostGIS_Version();" > /dev/null 2>&1; then
         print_success "PostGIS extension test passed"
@@ -129,7 +129,7 @@ test_connection() {
         print_error "PostGIS extension test failed"
         exit 1
     fi
-    
+
     # Test Redis connection
     if docker-compose exec redis redis-cli ping | grep -q "PONG"; then
         print_success "Redis connection test passed"
@@ -166,7 +166,7 @@ main() {
     echo "🎯 Rewind the Map - Database Setup"
     echo "=================================="
     echo ""
-    
+
     check_docker
     check_docker_compose
     start_database

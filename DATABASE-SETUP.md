@@ -155,7 +155,7 @@ SELECT calculate_distance(40.7128, -74.0060, 34.0522, -118.2437);
 ### **Bounding Box Query**
 ```sql
 -- Find photos within a bounding box
-SELECT * FROM photos 
+SELECT * FROM photos
 WHERE ST_Within(location, ST_MakeEnvelope(-74.1, 40.7, -73.9, 40.8, 4326));
 ```
 

@@ -252,7 +252,7 @@ CREATE OR REPLACE FUNCTION find_photos_within_radius(
 ) AS $$
 BEGIN
     RETURN QUERY
-    SELECT 
+    SELECT
         p.id,
         p.title,
         p.location,
@@ -307,7 +307,7 @@ INSERT INTO tags (name, description) VALUES
 
 -- Create a view for photo statistics
 CREATE VIEW photo_stats AS
-SELECT 
+SELECT
     p.id,
     p.title,
     p.uploader_id,

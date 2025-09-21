@@ -151,11 +151,11 @@ export class PhotoModel {
   async findById(id: string): Promise<Photo | null> {
     const query = 'SELECT * FROM photos WHERE id = $1 AND soft_deleted_at IS NULL';
     const result = await this.pool.query(query, [id]);
-    
+
     if (result.rows.length === 0) {
       return null;
     }
-    
+
     return this.mapRowToPhoto(result.rows[0]);
   }
 
@@ -171,7 +171,7 @@ export class PhotoModel {
     Object.entries(photoData).forEach(([key, value]) => {
       if (value !== undefined) {
         const dbField = key.replace(/([A-Z])/g, '_$1').toLowerCase();
-        
+
         if (key === 'location') {
           fields.push(`location = ST_Point($${paramCount}, $${paramCount + 1})`);
           values.push(value.longitude, value.latitude);
@@ -190,18 +190,18 @@ export class PhotoModel {
 
     values.push(id);
     const query = `
-      UPDATE photos 
+      UPDATE photos
       SET ${fields.join(', ')}, updated_at = NOW()
       WHERE id = $${paramCount} AND soft_deleted_at IS NULL
       RETURNING *
     `;
 
     const result = await this.pool.query(query, values);
-    
+
     if (result.rows.length === 0) {
       return null;
     }
-    
+
     return this.mapRowToPhoto(result.rows[0]);
   }
 
@@ -210,7 +210,7 @@ export class PhotoModel {
    */
   async delete(id: string): Promise<boolean> {
     const query = `
-      UPDATE photos 
+      UPDATE photos
       SET soft_deleted_at = NOW(), updated_at = NOW()
       WHERE id = $1 AND soft_deleted_at IS NULL
     `;
@@ -229,12 +229,12 @@ export class PhotoModel {
     limit: number = 50
   ): Promise<Photo[]> {
     const query = `
-      SELECT *, 
+      SELECT *,
         ST_Distance(
           ST_GeogFromText('POINT(' || $2 || ' ' || $1 || ')'),
           ST_GeogFromText('POINT(' || ST_X(location) || ' ' || ST_Y(location) || ')')
         ) / 1000 as distance_km
-      FROM photos 
+      FROM photos
       WHERE ST_DWithin(
         ST_GeogFromText('POINT(' || $2 || ' ' || $1 || ')'),
         ST_GeogFromText('POINT(' || ST_X(location) || ' ' || ST_Y(location) || ')'),
@@ -315,7 +315,7 @@ export class PhotoModel {
     const offset = filters.offset || 0;
 
     const query = `
-      SELECT * FROM photos 
+      SELECT * FROM photos
       ${whereClause}
       ORDER BY created_at DESC
       LIMIT $${paramCount} OFFSET $${paramCount + 1}
@@ -335,7 +335,7 @@ export class PhotoModel {
     const endYear = decade + 9;
 
     const query = `
-      SELECT * FROM photos 
+      SELECT * FROM photos
       WHERE EXTRACT(YEAR FROM capture_date) BETWEEN $1 AND $2
       AND moderation_status = 'approved'
       AND soft_deleted_at IS NULL
@@ -352,7 +352,7 @@ export class PhotoModel {
    */
   async incrementViewCount(id: string): Promise<boolean> {
     const query = `
-      UPDATE photos 
+      UPDATE photos
       SET view_count = view_count + 1, updated_at = NOW()
       WHERE id = $1 AND soft_deleted_at IS NULL
     `;
@@ -371,12 +371,12 @@ export class PhotoModel {
   }> {
     const query = `
       SELECT view_count, like_count, comment_count
-      FROM photos 
+      FROM photos
       WHERE id = $1 AND soft_deleted_at IS NULL
     `;
 
     const result = await this.pool.query(query, [id]);
-    
+
     if (result.rows.length === 0) {
       return { viewCount: 0, likeCount: 0, commentCount: 0 };
     }

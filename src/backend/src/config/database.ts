@@ -1,4 +1,4 @@
-import { Pool, PoolConfig } from 'pg';
+import { Pool } from 'pg';
 
 // Database configuration interface
 export interface DatabaseConfig {
@@ -17,7 +17,7 @@ export interface DatabaseConfig {
 // Environment-based configuration
 const getDatabaseConfig = (): DatabaseConfig => {
   const env = process.env.NODE_ENV || 'development';
-  
+
   const baseConfig: DatabaseConfig = {
     host: process.env.DB_HOST || 'localhost',
     port: parseInt(process.env.DB_PORT || '5432'),
@@ -41,25 +41,25 @@ export const getPool = (): Pool => {
   if (!pool) {
     const config = getDatabaseConfig();
     pool = new Pool(config);
-    
+
     // Handle pool errors
     pool.on('error', (err) => {
       console.error('Unexpected error on idle client', err);
       process.exit(-1);
     });
-    
+
     // Log pool events in development
     if (process.env.NODE_ENV === 'development') {
       pool.on('connect', () => {
         console.log('📊 New client connected to database');
       });
-      
+
       pool.on('remove', () => {
         console.log('📊 Client removed from pool');
       });
     }
   }
-  
+
   return pool;
 };
 
@@ -68,15 +68,15 @@ export const testConnection = async (): Promise<boolean> => {
   try {
     const pool = getPool();
     const client = await pool.connect();
-    
+
     // Test basic connection
     const result = await client.query('SELECT NOW() as current_time');
     console.log('✅ Database connection successful:', result.rows[0].current_time);
-    
+
     // Test PostGIS extension
     const postgisResult = await client.query('SELECT PostGIS_Version() as postgis_version');
     console.log('✅ PostGIS extension available:', postgisResult.rows[0].postgis_version);
-    
+
     client.release();
     return true;
   } catch (error) {
@@ -101,7 +101,7 @@ export const executeQuery = async <T = any>(
 ): Promise<T[]> => {
   const pool = getPool();
   const client = await pool.connect();
-  
+
   try {
     const result = await client.query(query, params);
     return result.rows;
@@ -119,16 +119,16 @@ export const executeTransaction = async <T = any>(
 ): Promise<T[]> => {
   const pool = getPool();
   const client = await pool.connect();
-  
+
   try {
     await client.query('BEGIN');
-    
+
     const results: T[] = [];
     for (const { query, params = [] } of queries) {
       const result = await client.query(query, params);
       results.push(result.rows);
     }
-    
+
     await client.query('COMMIT');
     return results;
   } catch (error) {

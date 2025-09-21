@@ -95,11 +95,11 @@ export class UserModel {
   async findById(id: string): Promise<User | null> {
     const query = 'SELECT * FROM users WHERE id = $1 AND is_active = true';
     const result = await this.pool.query(query, [id]);
-    
+
     if (result.rows.length === 0) {
       return null;
     }
-    
+
     return this.mapRowToUser(result.rows[0]);
   }
 
@@ -109,11 +109,11 @@ export class UserModel {
   async findByEmail(email: string): Promise<User | null> {
     const query = 'SELECT * FROM users WHERE email = $1 AND is_active = true';
     const result = await this.pool.query(query, [email]);
-    
+
     if (result.rows.length === 0) {
       return null;
     }
-    
+
     return this.mapRowToUser(result.rows[0]);
   }
 
@@ -141,18 +141,18 @@ export class UserModel {
 
     values.push(id);
     const query = `
-      UPDATE users 
+      UPDATE users
       SET ${fields.join(', ')}, updated_at = NOW()
       WHERE id = $${paramCount} AND is_active = true
       RETURNING *
     `;
 
     const result = await this.pool.query(query, values);
-    
+
     if (result.rows.length === 0) {
       return null;
     }
-    
+
     return this.mapRowToUser(result.rows[0]);
   }
 
@@ -161,7 +161,7 @@ export class UserModel {
    */
   async delete(id: string): Promise<boolean> {
     const query = `
-      UPDATE users 
+      UPDATE users
       SET is_active = false, updated_at = NOW()
       WHERE id = $1 AND is_active = true
     `;
@@ -176,7 +176,7 @@ export class UserModel {
   async findByRole(role: string): Promise<User[]> {
     const query = 'SELECT * FROM users WHERE $1 = ANY(roles) AND is_active = true ORDER BY created_at DESC';
     const result = await this.pool.query(query, [role]);
-    
+
     return result.rows.map(row => this.mapRowToUser(row));
   }
 
@@ -185,12 +185,12 @@ export class UserModel {
    */
   async searchByDisplayName(searchTerm: string, limit: number = 20): Promise<User[]> {
     const query = `
-      SELECT * FROM users 
-      WHERE display_name ILIKE $1 AND is_active = true 
-      ORDER BY display_name 
+      SELECT * FROM users
+      WHERE display_name ILIKE $1 AND is_active = true
+      ORDER BY display_name
       LIMIT $2
     `;
-    
+
     const result = await this.pool.query(query, [`%${searchTerm}%`, limit]);
     return result.rows.map(row => this.mapRowToUser(row));
   }
@@ -205,21 +205,21 @@ export class UserModel {
     totalComments: number;
   }> {
     const query = `
-      SELECT 
+      SELECT
         COUNT(p.id) as photo_count,
         COALESCE(SUM(p.view_count), 0) as total_views,
         COALESCE(SUM(p.like_count), 0) as total_likes,
         COALESCE(SUM(p.comment_count), 0) as total_comments
       FROM users u
-      LEFT JOIN photos p ON u.id = p.uploader_id 
-        AND p.moderation_status = 'approved' 
+      LEFT JOIN photos p ON u.id = p.uploader_id
+        AND p.moderation_status = 'approved'
         AND p.soft_deleted_at IS NULL
       WHERE u.id = $1 AND u.is_active = true
       GROUP BY u.id
     `;
 
     const result = await this.pool.query(query, [id]);
-    
+
     if (result.rows.length === 0) {
       return {
         photoCount: 0,
