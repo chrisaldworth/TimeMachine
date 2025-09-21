@@ -1,0 +1,28 @@
+name: staging
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+protection_rules:
+  - type: required_reviewers
+    required_reviewers: 1
+  - type: wait_timer
+    wait_timer: 0
+
+environment_variables:
+  NODE_ENV: staging
+  PORT: 3000
+  DATABASE_URL: ${{ secrets.STAGING_DATABASE_URL }}
+  REDIS_URL: ${{ secrets.STAGING_REDIS_URL }}
+  JWT_SECRET: ${{ secrets.STAGING_JWT_SECRET }}
+  MAPBOX_ACCESS_TOKEN: ${{ secrets.STAGING_MAPBOX_ACCESS_TOKEN }}
+  AWS_ACCESS_KEY_ID: ${{ secrets.STAGING_AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.STAGING_AWS_SECRET_ACCESS_KEY }}
+  AWS_REGION: ${{ secrets.STAGING_AWS_REGION }}
+  AWS_S3_BUCKET: ${{ secrets.STAGING_AWS_S3_BUCKET }}
+  SMTP_HOST: ${{ secrets.STAGING_SMTP_HOST }}
+  SMTP_PORT: ${{ secrets.STAGING_SMTP_PORT }}
+  SMTP_USER: ${{ secrets.STAGING_SMTP_USER }}
+  SMTP_PASS: ${{ secrets.STAGING_SMTP_PASS }}
+  CORS_ORIGIN: ${{ secrets.STAGING_CORS_ORIGIN }}

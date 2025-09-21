@@ -1,4 +1,4 @@
-import { formatDate, formatDecade, generateId, validateEmail, calculateDistance } from '../../../src/shared/src/utils';
+import { calculateDistance, formatDate, formatDecade, generateId, validateEmail } from '../../../src/shared/src/utils';
 
 describe('Shared Utils', () => {
   describe('formatDate', () => {
