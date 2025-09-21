@@ -39,7 +39,18 @@
     "tasks": "node project-management/task-manager.js",
     "board": "open project-management/kanban-board.html",
     "install:all": "npm install && npm run install:workspaces",
-    "install:workspaces": "npm install --workspaces"
+    "install:workspaces": "npm install --workspaces",
+    "db:setup": "./scripts/setup-database.sh",
+    "db:start": "./scripts/setup-database.sh start",
+    "db:stop": "./scripts/setup-database.sh stop",
+    "db:restart": "./scripts/setup-database.sh restart",
+    "db:test": "./scripts/setup-database.sh test",
+    "db:logs": "./scripts/setup-database.sh logs",
+    "db:connect": "./scripts/setup-database.sh connect",
+    "migrate": "cd src/backend && npm run migrate",
+    "migrate:up": "cd src/backend && npm run migrate:up",
+    "migrate:status": "cd src/backend && npm run migrate:status",
+    "migrate:rollback": "cd src/backend && npm run migrate:rollback"
   },
   "keywords": [
     "historical-photos",

@@ -2,7 +2,7 @@
 
 /**
  * Performance Monitoring Script for Cursor AI
- * 
+ *
  * This script monitors AI model performance, costs, and usage patterns
  * to optimize the multi-model strategy.
  */
@@ -87,32 +87,32 @@ function saveMetrics(metrics) {
 // Record model usage
 function recordModelUsage(model, responseTime, cost, success, qualityScore) {
   const metrics = loadMetrics();
-  
+
   if (!metrics.models[model]) {
     metrics.models[model] = { ...DEFAULT_METRICS.models['gpt-5'] };
   }
-  
+
   const modelMetrics = metrics.models[model];
-  
+
   // Update counters
   modelMetrics.totalRequests++;
   modelMetrics.totalCost += cost;
   modelMetrics.lastUsed = new Date().toISOString();
-  
+
   // Update averages
-  modelMetrics.averageResponseTime = 
-    (modelMetrics.averageResponseTime * (modelMetrics.totalRequests - 1) + responseTime) / 
+  modelMetrics.averageResponseTime =
+    (modelMetrics.averageResponseTime * (modelMetrics.totalRequests - 1) + responseTime) /
     modelMetrics.totalRequests;
-  
+
   // Update success rate
   const successCount = modelMetrics.successRate * (modelMetrics.totalRequests - 1) + (success ? 1 : 0);
   modelMetrics.successRate = successCount / modelMetrics.totalRequests;
-  
+
   // Update quality score
-  modelMetrics.qualityScore = 
-    (modelMetrics.qualityScore * (modelMetrics.totalRequests - 1) + qualityScore) / 
+  modelMetrics.qualityScore =
+    (modelMetrics.qualityScore * (modelMetrics.totalRequests - 1) + qualityScore) /
     modelMetrics.totalRequests;
-  
+
   // Update task metrics
   metrics.tasks.total++;
   if (success) {
@@ -120,17 +120,17 @@ function recordModelUsage(model, responseTime, cost, success, qualityScore) {
   } else {
     metrics.tasks.failed++;
   }
-  
+
   // Update cost metrics
   metrics.costs.daily += cost;
   metrics.costs.weekly += cost;
   metrics.costs.monthly += cost;
-  
+
   // Update performance metrics
-  metrics.performance.averageResponseTime = 
-    (metrics.performance.averageResponseTime * (metrics.tasks.total - 1) + responseTime) / 
+  metrics.performance.averageResponseTime =
+    (metrics.performance.averageResponseTime * (metrics.tasks.total - 1) + responseTime) /
     metrics.tasks.total;
-  
+
   saveMetrics(metrics);
   return metrics;
 }
@@ -139,13 +139,13 @@ function recordModelUsage(model, responseTime, cost, success, qualityScore) {
 function getModelRecommendations() {
   const metrics = loadMetrics();
   const recommendations = [];
-  
+
   Object.entries(metrics.models).forEach(([model, modelMetrics]) => {
     if (modelMetrics.totalRequests > 0) {
       const efficiency = modelMetrics.qualityScore / (modelMetrics.totalCost / modelMetrics.totalRequests);
       const reliability = modelMetrics.successRate;
       const speed = 1 / modelMetrics.averageResponseTime;
-      
+
       recommendations.push({
         model,
         efficiency,
@@ -157,10 +157,10 @@ function getModelRecommendations() {
       });
     }
   });
-  
+
   // Sort by efficiency
   recommendations.sort((a, b) => b.efficiency - a.efficiency);
-  
+
   return recommendations;
 }
 
@@ -168,7 +168,7 @@ function getModelRecommendations() {
 function checkCostAlerts() {
   const metrics = loadMetrics();
   const alerts = [];
-  
+
   // Daily cost alert
   if (metrics.costs.daily > metrics.costs.budget * 0.1) {
     alerts.push({
@@ -177,7 +177,7 @@ function checkCostAlerts() {
       severity: 'warning'
     });
   }
-  
+
   // Weekly cost alert
   if (metrics.costs.weekly > metrics.costs.budget * 0.5) {
     alerts.push({
@@ -186,7 +186,7 @@ function checkCostAlerts() {
       severity: 'warning'
     });
   }
-  
+
   // Monthly cost alert
   if (metrics.costs.monthly > metrics.costs.budget) {
     alerts.push({
@@ -195,7 +195,7 @@ function checkCostAlerts() {
       severity: 'critical'
     });
   }
-  
+
   // Budget threshold alert
   if (metrics.costs.monthly > metrics.costs.budget * (metrics.costs.alertThreshold / 100)) {
     alerts.push({
@@ -204,7 +204,7 @@ function checkCostAlerts() {
       severity: 'alert'
     });
   }
-  
+
   return alerts;
 }
 
@@ -213,11 +213,11 @@ function generateReport() {
   const metrics = loadMetrics();
   const recommendations = getModelRecommendations();
   const alerts = checkCostAlerts();
-  
+
   console.log('📊 Cursor AI Performance Report');
   console.log('================================');
   console.log('');
-  
+
   // Model performance
   console.log('🤖 Model Performance:');
   recommendations.forEach((rec, index) => {
@@ -230,7 +230,7 @@ function generateReport() {
     console.log(`     Quality: ${rec.qualityScore.toFixed(1)}/10`);
     console.log('');
   });
-  
+
   // Task metrics
   console.log('📋 Task Metrics:');
   console.log(`  Total Tasks: ${metrics.tasks.total}`);
@@ -239,7 +239,7 @@ function generateReport() {
   console.log(`  Success Rate: ${((metrics.tasks.completed / metrics.tasks.total) * 100).toFixed(1)}%`);
   console.log(`  Avg Response Time: ${metrics.performance.averageResponseTime.toFixed(2)}s`);
   console.log('');
-  
+
   // Cost metrics
   console.log('💰 Cost Metrics:');
   console.log(`  Daily: $${metrics.costs.daily.toFixed(2)}`);
@@ -248,37 +248,37 @@ function generateReport() {
   console.log(`  Budget: $${metrics.costs.budget}`);
   console.log(`  Usage: ${((metrics.costs.monthly / metrics.costs.budget) * 100).toFixed(1)}%`);
   console.log('');
-  
+
   // Alerts
   if (alerts.length > 0) {
     console.log('⚠️  Alerts:');
     alerts.forEach(alert => {
-      const icon = alert.severity === 'critical' ? '🚨' : 
-                   alert.severity === 'alert' ? '⚠️' : '⚠️';
+      const icon = alert.severity === 'critical' ? '🚨' :
+        alert.severity === 'alert' ? '⚠️' : '⚠️';
       console.log(`  ${icon} ${alert.message}`);
     });
     console.log('');
   }
-  
+
   // Recommendations
   console.log('💡 Recommendations:');
   if (recommendations.length > 0) {
     const bestModel = recommendations[0];
     console.log(`  • Use ${bestModel.model} for optimal efficiency`);
-    
+
     if (metrics.costs.monthly > metrics.costs.budget * 0.8) {
       console.log('  • Consider using more cost-effective models for simple tasks');
     }
-    
+
     if (metrics.performance.averageResponseTime > 30) {
       console.log('  • Response times are high, consider optimizing prompts');
     }
-    
+
     if (metrics.tasks.failed > metrics.tasks.total * 0.1) {
       console.log('  • High failure rate, review model selection criteria');
     }
   }
-  
+
   console.log('');
   console.log('✅ Report generated successfully!');
 }
@@ -293,7 +293,7 @@ function resetMetrics() {
 function main() {
   const args = process.argv.slice(2);
   const command = args[0];
-  
+
   switch (command) {
     case 'report':
       generateReport();

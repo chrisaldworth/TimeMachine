@@ -12,7 +12,18 @@
     "test:coverage": "jest --coverage",
     "lint": "eslint src --ext .ts,.js",
     "lint:fix": "eslint src --ext .ts,.js --fix",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "migrate": "ts-node src/scripts/migrate.ts",
+    "migrate:up": "ts-node src/scripts/migrate.ts up",
+    "migrate:status": "ts-node src/scripts/migrate.ts status",
+    "migrate:rollback": "ts-node src/scripts/migrate.ts rollback",
+    "db:setup": "../scripts/setup-database.sh",
+    "db:start": "../scripts/setup-database.sh start",
+    "db:stop": "../scripts/setup-database.sh stop",
+    "db:restart": "../scripts/setup-database.sh restart",
+    "db:test": "../scripts/setup-database.sh test",
+    "db:logs": "../scripts/setup-database.sh logs",
+    "db:connect": "../scripts/setup-database.sh connect"
   },
   "dependencies": {
     "express": "^4.18.2",

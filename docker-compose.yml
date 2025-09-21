@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  # PostgreSQL with PostGIS
+  postgres:
+    image: postgis/postgis:15-3.3
+    container_name: rewind_postgres
+    environment:
+      POSTGRES_DB: rewind_the_map
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./src/backend/src/migrations:/docker-entrypoint-initdb.d
+    networks:
+      - rewind_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d rewind_the_map"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: rewind_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - rewind_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: src/backend/Dockerfile
+    container_name: rewind_backend
+    environment:
+      NODE_ENV: development
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: rewind_the_map
+      DB_USER: postgres
+      DB_PASSWORD: password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./src:/app/src
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - rewind_network
+    restart: unless-stopped
+
+  # Frontend (React Native Metro)
+  frontend:
+    build:
+      context: .
+      dockerfile: src/frontend/Dockerfile
+    container_name: rewind_frontend
+    environment:
+      NODE_ENV: development
+      REACT_NATIVE_PACKAGER_HOSTNAME: 0.0.0.0
+    ports:
+      - "8081:8081"
+    volumes:
+      - ./src/frontend:/app
+      - /app/node_modules
+    networks:
+      - rewind_network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  rewind_network:
+    driver: bridge

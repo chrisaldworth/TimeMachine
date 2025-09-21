@@ -80,6 +80,10 @@
     "minQualityScore": 8.0,
     "enableValidation": true,
     "fallbackOnLowQuality": true,
-    "qualityMetrics": ["accuracy", "completeness", "consistency"]
+    "qualityMetrics": [
+      "accuracy",
+      "completeness",
+      "consistency"
+    ]
   }
 }
