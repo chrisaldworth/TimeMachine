@@ -222,12 +222,12 @@ jobs:
     steps:
       - name: Check all jobs
         run: |
-          if [[ "${{ needs.code-quality.result }}" == "success" && 
-                "${{ needs.unit-tests.result }}" == "success" && 
-                "${{ needs.build.result }}" == "success" && 
-                "${{ needs.security.result }}" == "success" && 
-                "${{ needs.integration-tests.result }}" == "success" && 
-                "${{ needs.e2e-tests.result }}" == "success" && 
+          if [[ "${{ needs.code-quality.result }}" == "success" &&
+                "${{ needs.unit-tests.result }}" == "success" &&
+                "${{ needs.build.result }}" == "success" &&
+                "${{ needs.security.result }}" == "success" &&
+                "${{ needs.integration-tests.result }}" == "success" &&
+                "${{ needs.e2e-tests.result }}" == "success" &&
                 "${{ needs.performance-tests.result }}" == "success" ]]; then
             echo "✅ All CI checks passed!"
             exit 0

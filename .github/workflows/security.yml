@@ -149,10 +149,10 @@ jobs:
           echo "- Security Headers: ${{ needs.security-headers.result }}" >> security-report.md
           echo "" >> security-report.md
           echo "## Summary" >> security-report.md
-          if [[ "${{ needs.dependency-scan.result }}" == "success" && 
-                "${{ needs.code-scan.result }}" == "success" && 
-                "${{ needs.secret-scan.result }}" == "success" && 
-                "${{ needs.license-scan.result }}" == "success" && 
+          if [[ "${{ needs.dependency-scan.result }}" == "success" &&
+                "${{ needs.code-scan.result }}" == "success" &&
+                "${{ needs.secret-scan.result }}" == "success" &&
+                "${{ needs.license-scan.result }}" == "success" &&
                 "${{ needs.security-headers.result }}" == "success" ]]; then
             echo "✅ All security checks passed!" >> security-report.md
           else

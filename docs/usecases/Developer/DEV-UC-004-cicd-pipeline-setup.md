@@ -2,11 +2,11 @@
 
 ## 👨‍💻 **Developer Use Case: CI/CD Pipeline Configuration**
 
-**Actor:** DevOps Engineer / Lead Developer  
-**Goal:** Set up a complete CI/CD pipeline for automated testing, building, and deployment  
-**Context:** GitHub Actions-based pipeline for continuous integration and deployment  
-**Priority:** High  
-**Estimated Time:** 8 hours  
+**Actor:** DevOps Engineer / Lead Developer
+**Goal:** Set up a complete CI/CD pipeline for automated testing, building, and deployment
+**Context:** GitHub Actions-based pipeline for continuous integration and deployment
+**Priority:** High
+**Estimated Time:** 8 hours
 
 ## 📋 **Preconditions**
 - TASK-003 (Development Environment) is completed

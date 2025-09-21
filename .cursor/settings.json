@@ -1,0 +1,85 @@
+{
+  "cursor.ai.enabled": true,
+  "cursor.ai.primaryModel": "gpt-5",
+  "cursor.ai.fallbackModel": "claude-3.5-sonnet",
+  "cursor.ai.fastModel": "claude-3-haiku",
+  "cursor.ai.modelSelection": {
+    "strategy": "intelligent-routing",
+    "criteria": {
+      "complexity": "high",
+      "taskType": "architecture",
+      "quality": "critical"
+    },
+    "routing": {
+      "code_generation": "gpt-5",
+      "architecture": "gpt-5",
+      "code_review": "gpt-5",
+      "documentation": "gpt-5",
+      "debugging": "gpt-5",
+      "testing": "claude-3.5-sonnet",
+      "quick_fixes": "claude-3-haiku",
+      "refactoring": "claude-3.5-sonnet",
+      "simple_tasks": "claude-3-haiku"
+    }
+  },
+  "cursor.ai.context": {
+    "project": "Rewind the Map",
+    "description": "Historical photo mapping platform with interactive time slider",
+    "architecture": "Modular Monolith",
+    "techStack": {
+      "frontend": "React Native with TypeScript",
+      "backend": "Node.js with Express and TypeScript",
+      "database": "PostgreSQL with PostGIS",
+      "cache": "Redis",
+      "storage": "AWS S3",
+      "maps": "Mapbox GL JS",
+      "testing": "Jest, React Testing Library, Cypress"
+    },
+    "keyFeatures": [
+      "Interactive world map with satellite imagery",
+      "Time slider with decade-based filtering",
+      "Drag-and-drop photo upload with location pinning",
+      "Real-time photo pin clustering",
+      "User profiles and upload statistics",
+      "Admin moderation interface",
+      "Photo metadata extraction and validation",
+      "Search and filtering by location, decade, and tags"
+    ],
+    "developmentWorkflow": "Use Case → Requirement → Test → Implement (TDD)",
+    "codeStandards": {
+      "language": "TypeScript",
+      "linting": "ESLint with TypeScript rules",
+      "formatting": "Prettier",
+      "testing": "Jest with >80% coverage",
+      "documentation": "JSDoc for all functions"
+    }
+  },
+  "cursor.ai.prompts": {
+    "useCase": "Generate a comprehensive use case document for: {description}",
+    "requirement": "Create detailed technical requirements for: {useCase}",
+    "test": "Write comprehensive tests for: {requirement} using TDD approach",
+    "implementation": "Implement: {requirement} with tests using TypeScript",
+    "review": "Review this code for: {aspects} and suggest improvements",
+    "optimize": "Optimize this code for: {goals} while maintaining quality",
+    "debug": "Debug this issue: {problem} and provide solution",
+    "document": "Generate documentation for: {code} with JSDoc comments"
+  },
+  "cursor.ai.performance": {
+    "maxResponseTime": 30,
+    "enableCaching": true,
+    "parallelProcessing": true,
+    "costOptimization": true
+  },
+  "cursor.ai.costManagement": {
+    "budgetLimit": 100,
+    "alertThreshold": 80,
+    "optimizationStrategy": "model-selection",
+    "usageTracking": true
+  },
+  "cursor.ai.quality": {
+    "minQualityScore": 8.0,
+    "enableValidation": true,
+    "fallbackOnLowQuality": true,
+    "qualityMetrics": ["accuracy", "completeness", "consistency"]
+  }
+}
